@@ -1,40 +1,31 @@
-using Microsoft.AspNetCore.SignalR;
+namespace Server;
 
 public class Program
 {
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        });
         builder.Services.AddSignalR();
+        builder.Services.AddControllers();
+        builder.WebHost.UseUrls("http://localhost:5222");
 
         var app = builder.Build();
 
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapHub<ChatHub>("/chat");
+            endpoints.MapHub<AppHub>("/app");
         });
+        app.UseCors("AllowAll");
+        app.MapControllers();
+        app.UseHttpsRedirection();
 
         app.Run();
-    }
-}
-
-public class ChatHub : Hub
-{
-    public async Task SendMessage(string user, string message)
-    {
-        await Clients.All.SendAsync("ReceiveMessage", user, message);
-    }
-
-    public override async Task OnConnectedAsync()
-    {
-        Console.WriteLine($"Client connected: {Context.ConnectionId}");
-        await base.OnConnectedAsync();
-    }
-
-    public override async Task OnDisconnectedAsync(Exception? ex)
-    {
-        Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
-        await base.OnDisconnectedAsync(ex);
     }
 }
