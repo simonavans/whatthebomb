@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  signalr_core: ^1.1.2
 
 dev_dependencies:
   flutter_test:
