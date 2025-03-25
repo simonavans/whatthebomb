@@ -38,9 +38,11 @@ public class AppHub : Hub
     }
 
     // TODO: make it so only host can start game
-    public async Task StartGameRequest()
+    public async Task StartGameRequest(string lobbyCode)
     {
-        await Clients.All.SendAsync("startgameevent", Program.GenerateSeed().ToString());
+        var lobby = GameStore.ActiveLobbies.FirstOrDefault(l => l.Code == lobbyCode);
+        if (lobby != null)
+            await Clients.All.SendAsync("startgameevent", lobby.Seed.ToString());
     }
 
     public async Task PassBombRequest(string sender, string receiver)
