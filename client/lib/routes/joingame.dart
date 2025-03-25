@@ -13,29 +13,31 @@ class JoinGame extends StatefulWidget {
 }
 
 class _JoinGameState extends State<JoinGame> {
-  final connection =
-      HubConnectionBuilder()
-          .withUrl(
-            'http://10.0.2.2:5222/app',
-            HttpConnectionOptions(
-              transport: HttpTransportType.webSockets,
-              logging: (_, msg) => dev.log(msg),
-            ),
-          )
-          .build();
-  bool connectionStarted = false;
+  late HubConnection connection;
 
   var codeTextCtl = TextEditingController();
   var nameTextCtl = TextEditingController(text: 'Player_1');
+  var ipTextCtl = TextEditingController(text: '192.168.');
+  var portTextCtl = TextEditingController(text: '5222');
 
   Future<List<String>> joinGame() async {
+    if (ipTextCtl.text.isEmpty || portTextCtl.text.isEmpty) {
+      return [];
+    }
+
+    connection =
+        HubConnectionBuilder()
+            .withUrl(
+              'http://${ipTextCtl.text}:${portTextCtl.text}/app',
+              HttpConnectionOptions(
+                transport: HttpTransportType.webSockets,
+                logging: (_, msg) => dev.log(msg),
+              ),
+            )
+            .build();
+
     // TODO: Fix already future completed bug when creating a game twice
     final completer = Completer<List<String>>();
-
-    if (!connectionStarted) {
-      await connection.start();
-      connectionStarted = true;
-    }
 
     connection.on('joingameresponse', (msg) {
       if (msg == null || msg.length < 2 || msg[0] != "ok") {
@@ -44,6 +46,7 @@ class _JoinGameState extends State<JoinGame> {
         return;
       }
 
+      connection.off('joingameresponse');
       completer.complete(msg[1].toString().split(';'));
     });
 
@@ -68,6 +71,16 @@ class _JoinGameState extends State<JoinGame> {
           TextField(
             decoration: InputDecoration(border: OutlineInputBorder()),
             controller: codeTextCtl,
+          ),
+          const Text('Server IP address'),
+          TextField(
+            decoration: InputDecoration(border: OutlineInputBorder()),
+            controller: ipTextCtl,
+          ),
+          const Text('Server port'),
+          TextField(
+            decoration: InputDecoration(border: OutlineInputBorder()),
+            controller: portTextCtl,
           ),
           const Text('My name'),
           TextField(

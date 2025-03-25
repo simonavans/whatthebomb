@@ -44,6 +44,7 @@ class _LobbyState extends State<Lobby> {
         return;
       }
 
+      super.widget.connection.off('startgameevent');
       completer.complete(int.parse(msg[0]));
     });
 
@@ -70,6 +71,7 @@ class _LobbyState extends State<Lobby> {
           MaterialPageRoute(
             builder:
                 (context) => Game(
+                  connection: super.widget.connection,
                   players: super.widget.players,
                   playerName: super.widget.playerName,
                   seed: int.parse(message[0]),
@@ -123,6 +125,7 @@ class _LobbyState extends State<Lobby> {
                     MaterialPageRoute(
                       builder:
                           (context) => Game(
+                            connection: super.widget.connection,
                             players: super.widget.players,
                             playerName: super.widget.playerName,
                             seed: seed,
