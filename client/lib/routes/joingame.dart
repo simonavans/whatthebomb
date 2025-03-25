@@ -82,8 +82,11 @@ class _JoinGameState extends State<JoinGame> {
                 context,
                 MaterialPageRoute(
                   builder:
-                      (context) =>
-                          Lobby(lobbyCode: codeTextCtl.text, players: players),
+                      (context) => Lobby(
+                        connection: connection,
+                        lobbyCode: codeTextCtl.text,
+                        players: players,
+                      ),
                 ),
               );
             },

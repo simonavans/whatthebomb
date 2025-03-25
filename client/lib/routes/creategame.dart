@@ -125,6 +125,7 @@ class _CreateGameState extends State<CreateGame> {
                   MaterialPageRoute(
                     builder:
                         (context) => Lobby(
+                          connection: connection,
                           lobbyCode: lobbyCode,
                           players: [textCtl.text],
                         ),
