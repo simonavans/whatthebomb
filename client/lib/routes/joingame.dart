@@ -86,6 +86,8 @@ class _JoinGameState extends State<JoinGame> {
                         connection: connection,
                         lobbyCode: codeTextCtl.text,
                         players: players,
+                        playerName: nameTextCtl.text,
+                        isHost: false,
                       ),
                 ),
               );

@@ -128,6 +128,8 @@ class _CreateGameState extends State<CreateGame> {
                           connection: connection,
                           lobbyCode: lobbyCode,
                           players: [textCtl.text],
+                          playerName: textCtl.text,
+                          isHost: true,
                         ),
                   ),
                 );
