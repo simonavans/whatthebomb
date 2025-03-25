@@ -35,6 +35,7 @@ class _JoinGameState extends State<JoinGame> {
               ),
             )
             .build();
+    await connection.start();
 
     // TODO: Fix already future completed bug when creating a game twice
     final completer = Completer<List<String>>();

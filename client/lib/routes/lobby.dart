@@ -48,7 +48,10 @@ class _LobbyState extends State<Lobby> {
       completer.complete(int.parse(msg[0]));
     });
 
-    await super.widget.connection.invoke('startgamerequest', args: []);
+    await super.widget.connection.invoke(
+      'startgamerequest',
+      args: [super.widget.lobbyCode],
+    );
 
     return completer.future;
   }

@@ -29,6 +29,7 @@ class _GameState extends State<Game> {
 
   @override
   void initState() {
+    super.widget.players.sort();
     int playerIndex = super.widget.players.indexOf(super.widget.playerName);
     assert(
       playerIndex != -1,
@@ -48,6 +49,7 @@ class _GameState extends State<Game> {
   Future<String> passBomb(String receiver) async {
     final completer = Completer<String>();
 
+    // TODO never off this method and put it in initstate
     super.widget.connection.on('passbombevent', (msg) {
       if (msg == null || msg.length < 2) {
         dev.log("msg was invalid", name: '$Game');
