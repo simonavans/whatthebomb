@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace Server;
 
 public class Program
@@ -13,7 +15,7 @@ public class Program
         });
         builder.Services.AddSignalR();
         builder.Services.AddControllers();
-        builder.WebHost.UseUrls("http://localhost:5222");
+        builder.WebHost.UseUrls("http://0.0.0.0:5222");
 
         var app = builder.Build();
 
@@ -25,6 +27,8 @@ public class Program
         app.UseCors("AllowAll");
         app.MapControllers();
         app.UseHttpsRedirection();
+
+        Console.WriteLine($"Running on {Dns.GetHostAddresses(Dns.GetHostName())[0]}");
 
         app.Run();
     }

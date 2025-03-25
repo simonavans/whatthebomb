@@ -43,6 +43,11 @@ public class AppHub : Hub
         await Clients.All.SendAsync("startgameevent", Program.GenerateSeed().ToString());
     }
 
+    public async Task PassBombRequest(string sender, string receiver)
+    {
+        await Clients.All.SendAsync("passbombevent", sender, receiver);
+    }
+
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"Client connected: {Context.ConnectionId}");
