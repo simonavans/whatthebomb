@@ -37,6 +37,12 @@ public class AppHub : Hub
         await Clients.Caller.SendAsync("joingameresponse", "ok", string.Join(";", lobby.Players));
     }
 
+    // TODO: make it so only host can start game
+    public async Task StartGameRequest()
+    {
+        await Clients.All.SendAsync("startgameevent", Program.GenerateSeed().ToString());
+    }
+
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"Client connected: {Context.ConnectionId}");

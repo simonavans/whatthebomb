@@ -28,4 +28,9 @@ public class Program
 
         app.Run();
     }
+
+    public static long GenerateSeed()
+    {
+        return Random.Shared.NextInt64();
+    }
 }
