@@ -33,6 +33,7 @@ public class AppHub : Hub
         lobby.Players.Add(new Player(playerName));
 
         // TODO: make sure the separator cannot be input as name
+        await Clients.Others.SendAsync("joingameevent", playerName);
         await Clients.Caller.SendAsync("joingameresponse", "ok", string.Join(";", lobby.Players));
     }
 
