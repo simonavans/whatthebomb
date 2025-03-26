@@ -5,12 +5,15 @@ namespace Server;
 
 public class AppHub : Hub
 {
+    // TODO: Only send messages to clients in the same lobby!
     public async Task CreateGameRequest(string playerName)
     {
-        var player = new Player(playerName);
+        var player = new Player(playerName, Context.ConnectionId);
         var lobby = new Lobby(player);
 
         GameStore.ActiveLobbies.Add(lobby);
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobby.Code);
+
         await Clients.Caller.SendAsync("creategameresponse", "ok", lobby.Code);
     }
 
@@ -30,7 +33,8 @@ public class AppHub : Hub
             return;
         }
 
-        lobby.Players.Add(new Player(playerName));
+        lobby.Players.Add(new Player(playerName, Context.ConnectionId));
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobby.Code);
 
         // TODO: make sure the separator cannot be input as name
         await Clients.Others.SendAsync("joingameevent", playerName);
@@ -38,16 +42,18 @@ public class AppHub : Hub
     }
 
     // TODO: make it so only host can start game
-    public async Task StartGameRequest(string lobbyCode)
+    public async Task StartGameRequest()
     {
-        var lobby = GameStore.ActiveLobbies.FirstOrDefault(l => l.Code == lobbyCode);
+        var lobby = GameStore.GetLobbyByConnId(Context.ConnectionId);
         if (lobby != null)
-            await Clients.All.SendAsync("startgameevent", lobby.Seed.ToString());
+            await Clients.Group(lobby.Code).SendAsync("startgameevent", lobby.Seed.ToString());
     }
 
     public async Task PassBombRequest(string sender, string receiver)
     {
-        await Clients.All.SendAsync("passbombevent", sender, receiver);
+        var lobby = GameStore.GetLobbyByConnId(Context.ConnectionId);
+        if (lobby != null)
+            await Clients.Group(lobby.Code).SendAsync("passbombevent", sender, receiver);
     }
 
     public override async Task OnConnectedAsync()
