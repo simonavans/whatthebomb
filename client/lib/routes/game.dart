@@ -1,6 +1,9 @@
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:signalr_core/signalr_core.dart';
+import 'package:whatthebomb/main.dart';
+import 'package:whatthebomb/routes/end.dart';
 
 class Game extends StatefulWidget {
   const Game({
@@ -22,12 +25,22 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   final scrollController = ScrollController();
+  late int questionSeed;
+
   String question = '';
   bool holdsBomb = false;
-  String bombHolderText = '';
+  String bombHolder = '';
+
+  String nextQuestion() {
+    final random = Random(questionSeed);
+    questionSeed = random.nextInt(2 ^ 32);
+    return questions[questionSeed % questions.length];
+  }
 
   @override
   void initState() {
+    questionSeed = super.widget.seed;
+
     super.widget.players.sort();
     int playerIndex = super.widget.players.indexOf(super.widget.playerName);
     assert(
@@ -37,9 +50,8 @@ class _GameState extends State<Game> {
     int chosenPlrIndex = super.widget.seed % super.widget.players.length;
 
     setState(() {
-      question = (super.widget.seed % 8).toString();
-      bombHolderText =
-          '${super.widget.players[chosenPlrIndex].toUpperCase()} IS HOLDING THE BOMB';
+      question = nextQuestion();
+      bombHolder = super.widget.players[chosenPlrIndex];
       holdsBomb = chosenPlrIndex == playerIndex;
     });
 
@@ -51,9 +63,20 @@ class _GameState extends State<Game> {
 
       setState(() {
         holdsBomb = msg[1] == super.widget.playerName;
-        question = (super.widget.seed % 8).toString();
-        bombHolderText = '${msg[1]} IS HOLDING THE BOMB';
+        question = nextQuestion();
+        bombHolder = msg[1];
       });
+    });
+
+    Future.delayed(Duration(seconds: (super.widget.seed % 10) + 15), () {
+      String penalty = penalties[super.widget.seed % penalties.length];
+      super.widget.connection.stop();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => End(loser: bombHolder, penalty: penalty),
+        ),
+      );
     });
 
     super.initState();
@@ -74,7 +97,7 @@ class _GameState extends State<Game> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 60),
-            Text(bombHolderText),
+            Text('${bombHolder.toUpperCase()} IS HOLDING THE BOMB'),
             Card(
               color: Theme.of(context).colorScheme.onPrimary,
               child: Padding(

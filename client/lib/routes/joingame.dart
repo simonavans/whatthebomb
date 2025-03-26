@@ -37,7 +37,6 @@ class _JoinGameState extends State<JoinGame> {
             .build();
     await connection.start();
 
-    // TODO: Fix already future completed bug when creating a game twice
     final completer = Completer<List<String>>();
 
     connection.on('joingameresponse', (msg) {
@@ -71,55 +70,63 @@ class _JoinGameState extends State<JoinGame> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Join game'),
       ),
-      body: Column(
-        children: <Widget>[
-          const Text('Lobby code'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: codeTextCtl,
-          ),
-          const Text('Server IP address'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: ipTextCtl,
-          ),
-          const Text('Server port'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: portTextCtl,
-          ),
-          const Text('My name'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: nameTextCtl,
-          ),
-          TextButton(
-            onPressed: () async {
-              List<String> players = await joinGame();
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => Lobby(
-                        connection: connection,
-                        lobbyCode: codeTextCtl.text,
-                        players: players,
-                        playerName: nameTextCtl.text,
-                        isHost: false,
-                      ),
-                ),
-              );
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2),
-              ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            const Text('Lobby code'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: codeTextCtl,
             ),
-            child: Text('Enter lobby'),
-          ),
-        ],
+            const SizedBox(height: 20),
+            const Text('Server IP address'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: ipTextCtl,
+            ),
+            const SizedBox(height: 20),
+            const Text('Server port'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: portTextCtl,
+            ),
+            const SizedBox(height: 20),
+            const Text('My name'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: nameTextCtl,
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () async {
+                List<String> players = await joinGame();
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => Lobby(
+                          connection: connection,
+                          lobbyCode: codeTextCtl.text,
+                          players: players,
+                          playerName: nameTextCtl.text,
+                          isHost: false,
+                        ),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              child: Text('Enter lobby'),
+            ),
+          ],
+        ),
       ),
     );
   }

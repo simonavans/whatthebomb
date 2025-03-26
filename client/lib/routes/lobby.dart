@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:signalr_core/signalr_core.dart';
+import 'package:whatthebomb/main.dart';
 import 'package:whatthebomb/routes/game.dart';
 
 class Lobby extends StatefulWidget {
@@ -25,7 +26,7 @@ class Lobby extends StatefulWidget {
   State<StatefulWidget> createState() => _LobbyState();
 }
 
-class _LobbyState extends State<Lobby> {
+class _LobbyState extends State<Lobby> with RouteAware {
   final scrollController = ScrollController();
 
   @override
@@ -48,10 +49,7 @@ class _LobbyState extends State<Lobby> {
       completer.complete(int.parse(msg[0]));
     });
 
-    await super.widget.connection.invoke(
-      'startgamerequest',
-      args: [super.widget.lobbyCode],
-    );
+    await super.widget.connection.invoke('startgamerequest', args: []);
 
     return completer.future;
   }
@@ -60,7 +58,7 @@ class _LobbyState extends State<Lobby> {
     super.widget.connection.on('joingameevent', (message) {
       if (message != null && message.isNotEmpty) {
         setState(() {
-          super.widget.players.insert(0, message[0]); // Insert at the top
+          super.widget.players.insert(0, message[0]);
         });
       }
     });
@@ -88,6 +86,7 @@ class _LobbyState extends State<Lobby> {
   @override
   void dispose() {
     scrollController.dispose();
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
@@ -148,5 +147,22 @@ class _LobbyState extends State<Lobby> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPop() {
+    super.didPop();
+
+    if (super.widget.connection.state != HubConnectionState.disconnected &&
+        super.widget.connection.state != HubConnectionState.disconnecting) {
+      super.widget.connection.stop();
+      dev.log('Connection stopped', name: '$Lobby');
+    }
   }
 }

@@ -61,99 +61,59 @@ class _CreateGameState extends State<CreateGame> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Create game'),
       ),
-      body: Column(
-        children: <Widget>[
-          const Text('Server IP address'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: ipTextCtl,
-          ),
-          const Text('Server port'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: portTextCtl,
-          ),
-          const Text('My name'),
-          TextField(
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            controller: textCtl,
-          ),
-          const Text('Game settings'),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Text('Round length (seconds)'),
-          ),
-          Container(
-            margin: EdgeInsets.all(20),
-            child: Row(
-              children: <Widget>[
-                TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  child: Text('40-100'),
-                ),
-                Spacer(),
-                TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  child: Text('100-200'),
-                ),
-                Spacer(),
-                TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  child: Text('200-300'),
-                ),
-              ],
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            const Text('Server IP address'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: ipTextCtl,
             ),
-          ),
-          TextButton(
-            onPressed: () async {
-              String? lobbyCode = await createGame();
+            const SizedBox(height: 20),
+            const Text('Server port'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: portTextCtl,
+            ),
+            const SizedBox(height: 20),
+            const Text('My name'),
+            TextField(
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              controller: textCtl,
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () async {
+                String? lobbyCode = await createGame();
 
-              if (lobbyCode != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => Lobby(
-                          connection: connection,
-                          lobbyCode: lobbyCode,
-                          players: [textCtl.text],
-                          playerName: textCtl.text,
-                          isHost: true,
-                        ),
-                  ),
-                );
-              }
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2),
+                if (lobbyCode != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => Lobby(
+                            connection: connection,
+                            lobbyCode: lobbyCode,
+                            players: [textCtl.text],
+                            playerName: textCtl.text,
+                            isHost: true,
+                          ),
+                    ),
+                  );
+                }
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
+              child: Text('Create game'),
             ),
-            child: Text('Create game'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
