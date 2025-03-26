@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:signalr_core/signalr_core.dart';
@@ -43,30 +42,21 @@ class _GameState extends State<Game> {
           '${super.widget.players[chosenPlrIndex].toUpperCase()} IS HOLDING THE BOMB';
       holdsBomb = chosenPlrIndex == playerIndex;
     });
-    super.initState();
-  }
 
-  Future<String> passBomb(String receiver) async {
-    final completer = Completer<String>();
-
-    // TODO never off this method and put it in initstate
     super.widget.connection.on('passbombevent', (msg) {
       if (msg == null || msg.length < 2) {
         dev.log("msg was invalid", name: '$Game');
-        completer.complete("");
         return;
       }
 
-      super.widget.connection.off('passbombevent');
-      completer.complete(msg[0].toString());
+      setState(() {
+        holdsBomb = msg[1] == super.widget.playerName;
+        question = (super.widget.seed % 8).toString();
+        bombHolderText = '${msg[1]} IS HOLDING THE BOMB';
+      });
     });
 
-    super.widget.connection.invoke(
-      "passbombrequest",
-      args: [super.widget.playerName, receiver],
-    );
-
-    return completer.future;
+    super.initState();
   }
 
   @override
@@ -103,16 +93,13 @@ class _GameState extends State<Game> {
                           padding: const EdgeInsets.all(15),
                           child: TextButton(
                             onPressed: () async {
-                              await passBomb(super.widget.players[index]);
-                              setState(() {
-                                question = (super.widget.seed % 8).toString();
-                                bombHolderText =
-                                    '${super.widget.players[index].toUpperCase()} IS HOLDING THE BOMB';
-                                holdsBomb =
-                                    super.widget.players[index] ==
-                                    super.widget.playerName;
-                                dev.log('Holds bomb changed');
-                              });
+                              await super.widget.connection.invoke(
+                                "passbombrequest",
+                                args: [
+                                  super.widget.playerName,
+                                  super.widget.players[index],
+                                ],
+                              );
                             },
                             style: TextButton.styleFrom(
                               backgroundColor:

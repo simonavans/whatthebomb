@@ -41,8 +41,13 @@ class _JoinGameState extends State<JoinGame> {
     final completer = Completer<List<String>>();
 
     connection.on('joingameresponse', (msg) {
-      if (msg == null || msg.length < 2 || msg[0] != "ok") {
+      if (msg == null || msg.length < 2) {
         dev.log("msg was invalid", name: '$JoinGame');
+        completer.complete(List<String>.empty());
+        return;
+      }
+      if (msg[0] != "ok") {
+        dev.log("msg was invalid: ${msg[0]}, ${msg[1]}", name: '$JoinGame');
         completer.complete(List<String>.empty());
         return;
       }
